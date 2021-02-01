@@ -16,6 +16,30 @@
 
 </head>
 <body>
+<!-- Button trigger modal -->
+
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <input id="modal_produit"type="text"  value="" placeholder="Produit" name="produit">
+            <input id="modal_prix" type="number" value="" placeholder="Prix" name="Prix">
+        </div>
+        <div class="modal-footer">
+          <button type="button" v-model="add" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+          <button type="button"  v-model="add"  data-dismiss="modal" class="btn btn-primary">Ajouter </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <div id="main">
     <div>
@@ -24,7 +48,7 @@
         <li v-for="personne in personnes" class="nav-item">
           <a class="nav-link active" aria-current="page" href="#">
               <p v-if="personne.id == activeUtilisateur" ><b>{{ personne.nom }}</b></p>
-              <p v-else v-on:click="activeUtilisateur = personne.id" v-on:click="change()">{{ personne.nom }}</p>
+              <p v-else v-on:click="activeUtilisateur = personne.id" >{{ personne.nom }}</p>
             </a>
         </li>
       </ul>
@@ -32,32 +56,42 @@
       <h2 style="text-align:center;">Comptes:</h2>
       <ul class="nav justify-content-center">
          <li v-for="compte in comptes" class="nav-item">
-           <a v-if="activeUtilisateur in compte.utilisateurs" class="nav-link active" v-on:click="activeCompte =compte.id" aria-current="page" href="#">{{ compte.nom }}</a>
-         </li>
+            <div v-for="idUtilisateur in compte.utilisateurs">
+
+                <a v-if="activeUtilisateur == idUtilisateur" class="nav-link active" v-on:click="activeCompte =compte.id" aria-current="page" href="#">{{ compte.nom }}</a>
+            </div> 
+        </li>
        </ul>
     </div>
-    <div id="printedCompte" v-if="activeCompte != 'none' && activeUtilisateur in comptes[activeCompte].utilisateurs">
-
+    <div id="printedCompte" v-if="activeCompte != 'none'">
+        <div v-for="idUtilisateur in comptes[activeCompte].utilisateurs" v-if="activeUtilisateur == idUtilisateur">
       <h2 style="text-align:center;"><b>{{comptes[activeCompte].nom}}</b></h2>
         <ul class="nav justify-content-center">
 
         <h2 style="text-align:center;">Utilisateurs:</h2>
             <ul class="nav justify-content-center">
                 <li v-for="idUtilisateur in comptes[activeCompte].utilisateurs" class="nav-item">
-                  <a class="nav-link active" aria-current="page" href="#">{{ personnes[idUtilisateur].nom }}</a>
+                  <div class="nav-link active" aria-current="page" href="#">{{ personnes[idUtilisateur].nom }}</div>
                 </li>
               </ul>
           </ul>
-          <!-- <h2 style="text-align:center;">dépenses:</h2>
+          <h2 style="text-align:center;">dépenses:</h2>
+          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
+            Ajouter
+          </button>
+     
           <ul class="nav justify-content-center">
               <li v-for="depence in comptes[activeCompte].depences" class="nav-item">
-                <div>
-                    <div class="nav-link active" aria-current="page" href="#">{{ personnes[depense.utilisateur].nom }}</div>
-                    <div class="nav-link active" aria-current="page" href="#">à acheter: {{ depense.produit }}</div>
-                    <div class="nav-link active" aria-current="page" href="#">prix: {{ depense.prix }}</div>
+                <div v-if="depence.deleted==false">
+                    <div class="nav-link active" aria-current="page" href="#">{{ personnes[depence.utilisateur].nom }}</div>
+                    <div class="nav-link active" aria-current="page" href="#">à acheter: {{ depence.produit }}</div>
+                    <div class="nav-link active" aria-current="page" href="#">prix: {{ depence.prix }}€</div>
+                    <button v-if="depence.utilisateur ==activeUtilisateur" type="button" class="btn btn-success" @click="remove(depence)">
+                        Retirer
+                      </button>
                 </div>
               </li>
-            </ul> -->
+            </ul>
         </ul>
     </div>
 
@@ -112,30 +146,40 @@ var demo = new Vue({
                 "utilisateurs":[2,4,5],
                 "depences":[
                     {
+                        "id":0,
                         "utilisateur":2,
                         "produit":"eau",
                         "prix":3,
+                        "deleted":true,
                     },
                     {
+                        "id":1,
                         "utilisateur":2,
                         "produit":"bierre",
                         "prix":15,
+                        "deleted":false,
                     },
                     {
+                        "id":2,
                         "utilisateur":4,
                         "produit":"saucisson",
                         "prix":10,
+                        "deleted":false,
                     },
                     {
+                        "id":3,
                         "utilisateur":4,
                         "produit":"gateau",
                         "prix":6,
+                        "deleted":false,
                     },
                     {
+                        "id":4,
                         "utilisateur":5,
                         "produit":"viande",
                         "prix":20,
-                    }
+                        "deleted":false,
+                    },
                 ]
             },
             {
@@ -144,14 +188,18 @@ var demo = new Vue({
                 "utilisateurs":[0],
                 "depences":[
                     {
+                        "id":0,
                         "utilisateur":0,
                         "produit":"courses",
                         "prix":20,
+                        "deleted":false,
                     },
                     {
+                        "id":1,
                         "utilisateur":0,
                         "produit":"marché",
                         "prix":10,
+                        "deleted":false,
                     },
                 ]
             },
@@ -159,12 +207,24 @@ var demo = new Vue({
 	},
 
 	methods: {
-        affiche:function(item){
-            activeCompte=item.id;
+
+        add:function(){
+           var produit= document.getElementById('modal_produit').value;
+           var prix= document.getElementById('modal_prix').value;
+           console.log("coucou");
+           comptes[activeCompte].depences+={"utilisateur":activeUtilisateur,"produit":produit,"prix":prix};
+           document.getElementById('modal_produit').value="";
+           document.getElementById('modal_prix').value="";
         },
-      /*  change: function(){
-            document.getElementById('printedCompte').innerHTML="";
-        },*/
+        cancel:function(){
+            document.getElementById('modal_produit').value="";
+            document.getElementById('modal_prix').value="";
+        },
+        remove:function(item){
+            this.comptes[this.activeCompte].depences[item.id].deleted=true;
+        },
+
+
     },
     computed:{
 
