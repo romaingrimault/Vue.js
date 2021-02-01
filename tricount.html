@@ -24,7 +24,7 @@
         <li v-for="personne in personnes" class="nav-item">
           <a class="nav-link active" aria-current="page" href="#">
               <p v-if="personne.id == activeUtilisateur" ><b>{{ personne.nom }}</b></p>
-              <p v-else v-on:click="activeUtilisateur = personne.id">{{ personne.nom }}</p>
+              <p v-else v-on:click="activeUtilisateur = personne.id" v-on:click="change()">{{ personne.nom }}</p>
             </a>
         </li>
       </ul>
@@ -32,13 +32,15 @@
       <h2 style="text-align:center;">Comptes:</h2>
       <ul class="nav justify-content-center">
          <li v-for="compte in comptes" class="nav-item">
-           <a class="nav-link active" v-on:click="activeCompte =compte.id" aria-current="page" href="#">{{ compte.nom }}</a>
+           <a v-if="activeUtilisateur in compte.utilisateurs" class="nav-link active" v-on:click="activeCompte =compte.id" aria-current="page" href="#">{{ compte.nom }}</a>
          </li>
        </ul>
     </div>
-    <div v-if="activeCompte != 'none'">
-      <h2 style="text-align:center;">{{comptes[activeCompte].nom}}:</h2>
+    <div id="printedCompte" v-if="activeCompte != 'none' && activeUtilisateur in comptes[activeCompte].utilisateurs">
+
+      <h2 style="text-align:center;"><b>{{comptes[activeCompte].nom}}</b></h2>
         <ul class="nav justify-content-center">
+
         <h2 style="text-align:center;">Utilisateurs:</h2>
             <ul class="nav justify-content-center">
                 <li v-for="idUtilisateur in comptes[activeCompte].utilisateurs" class="nav-item">
@@ -46,6 +48,17 @@
                 </li>
               </ul>
           </ul>
+          <!-- <h2 style="text-align:center;">dépenses:</h2>
+          <ul class="nav justify-content-center">
+              <li v-for="depence in comptes[activeCompte].depences" class="nav-item">
+                <div>
+                    <div class="nav-link active" aria-current="page" href="#">{{ personnes[depense.utilisateur].nom }}</div>
+                    <div class="nav-link active" aria-current="page" href="#">à acheter: {{ depense.produit }}</div>
+                    <div class="nav-link active" aria-current="page" href="#">prix: {{ depense.prix }}</div>
+                </div>
+              </li>
+            </ul> -->
+        </ul>
     </div>
 
       
@@ -97,7 +110,7 @@ var demo = new Vue({
                 "id":0,
                 "nom":"Vacances à la plage",
                 "utilisateurs":[2,4,5],
-                "depence":[
+                "depences":[
                     {
                         "utilisateur":2,
                         "produit":"eau",
@@ -129,7 +142,7 @@ var demo = new Vue({
                 "id":1,
                 "nom":"Compte de la maison",
                 "utilisateurs":[0],
-                "depence":[
+                "depences":[
                     {
                         "utilisateur":0,
                         "produit":"courses",
@@ -149,7 +162,13 @@ var demo = new Vue({
         affiche:function(item){
             activeCompte=item.id;
         },
-	}
+      /*  change: function(){
+            document.getElementById('printedCompte').innerHTML="";
+        },*/
+    },
+    computed:{
+
+    }
 });
 </script>
 </body>
